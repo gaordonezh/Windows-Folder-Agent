@@ -1,55 +1,74 @@
+
 using System.Diagnostics;
 
 namespace WindowsFolderAgent.Services;
 
 public class FolderService
 {
-    private readonly string[] _allowedRoots =
+    private readonly string[] _allowedRoots;
+
+    public FolderService(IConfiguration configuration)
     {
-        @"C:\Archivos",
-        @"D:\Archivos",
-        @"\\SERVIDOR\Documentos"
-    };
+        _allowedRoots = configuration
+            .GetSection("AgentSettings:AllowedRoots")
+            .Get<string[]>() ?? [];
+    }
 
     public void OpenFolder(string folderPath)
     {
-        if (string.IsNullOrWhiteSpace(folderPath))
-            throw new ArgumentException("La ruta es obligatoria.");
-
         if (!OperatingSystem.IsWindows())
+        {
             throw new PlatformNotSupportedException(
                 "Esta operación requiere Windows.");
+        }
+
+        if (string.IsNullOrWhiteSpace(folderPath))
+        {
+            throw new ArgumentException(
+                "La ruta de la carpeta es obligatoria.");
+        }
 
         var fullPath = Path.GetFullPath(folderPath);
 
-        var allowed = _allowedRoots.Any(root =>
+        var authorized = _allowedRoots.Any(root =>
         {
-            var normalizedRoot = Path.GetFullPath(root)
-                .TrimEnd(Path.DirectorySeparatorChar,
-                         Path.AltDirectorySeparatorChar);
+            var normalizedRoot = Path.TrimEndingDirectorySeparator(
+                Path.GetFullPath(root)
+            );
 
-            return fullPath.Equals(
-                       normalizedRoot,
-                       StringComparison.OrdinalIgnoreCase)
-                   ||
-                   fullPath.StartsWith(
-                       normalizedRoot + Path.DirectorySeparatorChar,
-                       StringComparison.OrdinalIgnoreCase);
+            var relativePath = Path.GetRelativePath(
+                normalizedRoot,
+                fullPath
+            );
+
+            return relativePath == "." ||
+                   (!Path.IsPathRooted(relativePath) &&
+                    relativePath != ".." &&
+                    !relativePath.StartsWith(
+                        ".." + Path.DirectorySeparatorChar,
+                        StringComparison.Ordinal));
         });
 
-        if (!allowed)
+        if (!authorized)
+        {
             throw new UnauthorizedAccessException(
-                "La ubicación no está autorizada.");
+                "La carpeta está fuera de las ubicaciones autorizadas.");
+        }
 
         if (!Directory.Exists(fullPath))
+        {
             throw new DirectoryNotFoundException(
                 "La carpeta no existe.");
+        }
 
-        Process.Start(new ProcessStartInfo
+        var processInfo = new ProcessStartInfo
         {
             FileName = "explorer.exe",
-            Arguments = $"\"{fullPath}\"",
             UseShellExecute = true
-        });
+        };
+
+        processInfo.ArgumentList.Add(fullPath);
+
+        Process.Start(processInfo);
     }
 }

@@ -77,6 +77,13 @@ app.MapPost("/api/folders/open",
             message = "Carpeta abierta correctamente."
         });
     }
+    catch (UnauthorizedAccessException ex)
+    {
+        return Results.Json(
+            new { success = false, message = ex.Message },
+            statusCode: 403
+        );
+    }
     catch (Exception ex)
     {
         return Results.BadRequest(new
