@@ -6,7 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.UseUrls("http://127.0.0.1:3030");
 
-var allowedOrigins = builder.Configuration.GetSection("AgentSettings:AllowedOrigins").Get<string[]>() ?? [];
+var allowedOrigins = new[]
+{
+    "https://control.napcontable.com",
+    "http://localhost:5005"
+};
 
 builder.Services.AddCors(options =>
 {
