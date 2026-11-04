@@ -1,19 +1,9 @@
-
 using System.Diagnostics;
 
 namespace WindowsFolderAgent.Services;
 
 public class FolderService
 {
-    private readonly string[] _allowedRoots;
-
-    public FolderService(IConfiguration configuration)
-    {
-        _allowedRoots = configuration
-            .GetSection("AgentSettings:AllowedRoots")
-            .Get<string[]>() ?? [];
-    }
-
     public void OpenFolder(string folderPath)
     {
         if (!OperatingSystem.IsWindows())
@@ -29,31 +19,6 @@ public class FolderService
         }
 
         var fullPath = Path.GetFullPath(folderPath);
-
-        var authorized = _allowedRoots.Any(root =>
-        {
-            var normalizedRoot = Path.TrimEndingDirectorySeparator(
-                Path.GetFullPath(root)
-            );
-
-            var relativePath = Path.GetRelativePath(
-                normalizedRoot,
-                fullPath
-            );
-
-            return relativePath == "." ||
-                   (!Path.IsPathRooted(relativePath) &&
-                    relativePath != ".." &&
-                    !relativePath.StartsWith(
-                        ".." + Path.DirectorySeparatorChar,
-                        StringComparison.Ordinal));
-        });
-
-        if (!authorized)
-        {
-            throw new UnauthorizedAccessException(
-                "La carpeta está fuera de las ubicaciones autorizadas.");
-        }
 
         if (!Directory.Exists(fullPath))
         {

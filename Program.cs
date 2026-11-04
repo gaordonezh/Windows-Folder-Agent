@@ -1,3 +1,4 @@
+
 using WindowsFolderAgent.Models;
 using WindowsFolderAgent.Services;
 
@@ -5,10 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.UseUrls("http://127.0.0.1:3030");
 
-var allowedOrigins =
-    builder.Configuration
-        .GetSection("AgentSettings:AllowedOrigins")
-        .Get<string[]>() ?? [];
+var allowedOrigins = builder.Configuration.GetSection("AgentSettings:AllowedOrigins").Get<string[]>() ?? [];
 
 builder.Services.AddCors(options =>
 {
@@ -27,19 +25,16 @@ var app = builder.Build();
 
 app.UseCors("ReactApp");
 
-// Verificar el origen de las solicitudes a la API.
 app.Use(async (context, next) =>
 {
     if (context.Request.Path.StartsWithSegments("/api"))
     {
         var origin = context.Request.Headers.Origin.ToString();
 
-        if (string.IsNullOrWhiteSpace(origin) ||
-            !allowedOrigins.Contains(
-                origin,
-                StringComparer.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(origin) || !allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase))
         {
             context.Response.StatusCode = 403;
+
             await context.Response.WriteAsJsonAsync(new
             {
                 success = false,
@@ -64,8 +59,7 @@ app.MapGet("/api/agent/status", () =>
     });
 });
 
-app.MapPost("/api/folders/open",
-    (OpenFolderRequest request, FolderService folderService) =>
+app.MapPost("/api/folders/open", (OpenFolderRequest request, FolderService folderService) =>
 {
     try
     {
@@ -76,13 +70,6 @@ app.MapPost("/api/folders/open",
             success = true,
             message = "Carpeta abierta correctamente."
         });
-    }
-    catch (UnauthorizedAccessException ex)
-    {
-        return Results.Json(
-            new { success = false, message = ex.Message },
-            statusCode: 403
-        );
     }
     catch (Exception ex)
     {
