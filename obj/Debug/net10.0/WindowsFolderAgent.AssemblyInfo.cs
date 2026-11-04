@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WindowsFolderAgent")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+80d08d7aea0c1f8c38b433a0a57fb3eea18d140a")]
 [assembly: System.Reflection.AssemblyProductAttribute("WindowsFolderAgent")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WindowsFolderAgent")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
