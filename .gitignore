@@ -1,1 +1,49 @@
-bin
+# # Compilación y archivos temporales de .NET
+# bin/
+# obj/
+# net10.0/
+# [Bb]uild/
+# [Dd]ebug/
+# [Rr]elease/
+# artifacts/
+
+# # Archivos de Visual Studio
+# .vs/
+# *.user
+# *.suo
+# *.userosscache
+# *.sln.docstates
+
+# # Rider / JetBrains
+# .idea/
+# *.sln.iml
+
+# # VS Code
+# .vscode/
+
+# # Archivos del sistema operativo
+# .DS_Store
+# Thumbs.db
+# Desktop.ini
+
+# # Logs
+# *.log
+# logs/
+
+# # Archivos temporales
+# *.tmp
+# *.temp
+# *.bak
+
+# # Certificados y claves privadas
+# *.pfx
+# *.p12
+# *.key
+# *.pem
+
+# # Archivos de configuración locales
+# appsettings.Local.json
+# appsettings.Development.local.json
+
+# # Publicaciones generadas
+# publish/
